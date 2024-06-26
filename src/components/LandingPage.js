@@ -61,6 +61,13 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
       console.error('Error creating wallet:', error);
     }
   };
+  
+  // When showing the create wallet form, deselect the selected wallet
+  const showCreateWalletFormHandler = () => {
+    setShowCreateWalletForm(true);
+    setSelectedWallet(null);
+  };
+  
 
   const handleDeposit = async () => {
     if (!selectedWallet) return;
@@ -271,7 +278,7 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
                   {wallet.accountName}
                 </button>
               ))}
-              <button className="create-wallet-button" onClick={() => setShowCreateWalletForm(true)}>
+              <button className="create-wallet-button" onClick={showCreateWalletFormHandler}>
                 Create Wallet
               </button>
             </div>
@@ -299,7 +306,7 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
                 </div>
               </div>
             )}
-            {showCreateWalletForm && (
+            {!selectedWallet && showCreateWalletForm && (
               <div className="create-wallet-form">
                 <h3>Create Wallet</h3>
                 <form onSubmit={handleCreateWallet}>
