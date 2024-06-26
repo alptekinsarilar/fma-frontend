@@ -132,6 +132,33 @@ const LandingPage = () => {
     setMessageType('');
   };
 
+  const handleDeleteWallet = async () => {
+    if (!selectedWallet) return;
+    if (window.confirm(`Do you want to delete ${selectedWallet.accountName}?`)) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:5073/api/account/${selectedWallet.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json-patch+json'
+          }
+        });
+        setMessage('Wallet deleted successfully');
+        setMessageType('success');
+        setSelectedWallet(null);
+        setWallets(wallets.filter(wallet => wallet.id !== selectedWallet.id));
+      } catch (error) {
+        if (error.response) {
+          setMessage(error.response.data.message);
+          setMessageType('error');
+        } else {
+          setMessage('An error occurred while deleting the wallet');
+          setMessageType('error');
+        }
+      }
+    }
+  };
+
   return (
     <div className="landing-page">
       <div className="sidebar">
@@ -175,6 +202,7 @@ const LandingPage = () => {
                   />
                   <button onClick={handleDeposit}>Deposit</button>
                   <button onClick={handleWithdraw}>Withdraw</button>
+                  <button onClick={handleDeleteWallet} className="delete-button">Delete Wallet</button>
                   {message && <p className={`message ${messageType}`}>{message}</p>}
                 </div>
               </div>

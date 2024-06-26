@@ -137,6 +137,11 @@ body {
   opacity: 0.8;
 }
 
+.transaction-section .delete-button {
+  background-color: red;
+  color: white;
+}
+
 .transaction-section .message {
   margin-top: 10px;
 }
