@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -13,6 +15,12 @@ const LandingPage = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // success or error
   const [recipientAccountId, setRecipientAccountId] = useState('');
+
+  const [exchangeAmount, setExchangeAmount] = useState('');
+const [exchangeMessage, setExchangeMessage] = useState('');
+const [exchangeMessageType, setExchangeMessageType] = useState(''); // success or error
+const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('');
+
 
   useEffect(() => {
     if (activeSection === 'wallets') {
@@ -186,6 +194,47 @@ const LandingPage = () => {
     }
   };
 
+  const getUsernameFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      return decodedToken.given_name;
+    }
+    return null;
+  };
+
+  const handleExchangeFunds = async () => {
+    if (!selectedWallet) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5073/api/account/exchange', {
+        senderAccountId: selectedWallet.id,
+        recipientAccountId: parseInt(exchangeRecipientAccountId),
+        amount: parseFloat(exchangeAmount)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json-patch+json'
+        }
+      });
+      setExchangeMessage('Exchange successful');
+      setExchangeMessageType('success');
+      setExchangeAmount('');
+      setExchangeRecipientAccountId('');
+      fetchWallets();
+    } catch (error) {
+      if (error.response) {
+        setExchangeMessage(error.response.data.message);
+        setExchangeMessageType('error');
+      } else {
+        setExchangeMessage('An error occurred while exchanging funds');
+        setExchangeMessageType('error');
+      }
+    }
+  };
+  
+  
+
   return (
     <div className="landing-page">
       <div className="sidebar">
@@ -195,7 +244,10 @@ const LandingPage = () => {
         <div className={`sidebar-item ${activeSection === 'transfer' ? 'active' : ''}`} onClick={() => setActiveSection('transfer')}>
           Make Transfer
         </div>
-        <div className="sidebar-username">{localStorage.getItem('username')}</div>
+        <div className={`sidebar-item ${activeSection === 'exchange' ? 'active' : ''}`} onClick={() => setActiveSection('exchange')}>
+            Exchange Currency
+        </div>
+        <div className="sidebar-username">{getUsernameFromToken()}</div>
       </div>
       <div className="content">
         {activeSection === 'wallets' && (
@@ -311,6 +363,54 @@ const LandingPage = () => {
             )}
           </div>
         )}
+        {activeSection === 'exchange' && (
+        <div className="exchange-section">
+            <div className="wallet-buttons">
+            {wallets.map(wallet => (
+                <button
+                key={wallet.id}
+                className={`wallet-button ${selectedWallet?.id === wallet.id ? 'active' : ''}`}
+                onClick={() => handleWalletSelection(wallet)}
+                >
+                {wallet.accountName}
+                </button>
+            ))}
+            </div>
+            {selectedWallet && (
+            <div className="wallet-details">
+                <h3>{selectedWallet.accountName}</h3>
+                <p>Wallet ID: {selectedWallet.id}</p>
+                <p>Balance: {selectedWallet.balance}</p>
+                <p>Currency: {selectedWallet.currency === 0 ? 'TRY' : 'USD'}</p>
+                <div className="transaction-section">
+                <div className="input-group">
+                    <label htmlFor="exchangeRecipientAccountId">Recipient Account ID:</label>
+                    <input
+                    type="number"
+                    id="exchangeRecipientAccountId"
+                    value={exchangeRecipientAccountId}
+                    onChange={(e) => setExchangeRecipientAccountId(e.target.value)}
+                    placeholder="Recipient Account ID"
+                    />
+                </div>
+                <div className="input-group">
+                    <label htmlFor="exchangeAmount">Amount:</label>
+                    <input
+                    type="number"
+                    id="exchangeAmount"
+                    value={exchangeAmount}
+                    onChange={(e) => setExchangeAmount(e.target.value)}
+                    placeholder="Amount"
+                    />
+                </div>
+                <button onClick={handleExchangeFunds}>Exchange</button>
+                {exchangeMessage && <p className={`message ${exchangeMessageType}`}>{exchangeMessage}</p>}
+                </div>
+            </div>
+            )}
+        </div>
+        )}
+
       </div>
     </div>
   );

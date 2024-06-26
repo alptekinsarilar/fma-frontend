@@ -60,3 +60,25 @@ h2 {
 .register-button:hover {
   background-color: #0056b3;
 }
+
+.sidebar {
+    background-color: #100505;
+    padding: 20px;
+    border-right: 1px solid #9f2626;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: relative;
+    height: 100%;
+  }
+  
+  .sidebar-username {
+    margin-top: auto; /* Pushes the username to the bottom */
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    border-top: 1px solid #af9999; /* Optional: Adds a top border for separation */
+  }
+  
