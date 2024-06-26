@@ -12,6 +12,7 @@ const LandingPage = () => {
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // success or error
+  const [recipientAccountId, setRecipientAccountId] = useState('');
 
   useEffect(() => {
     if (activeSection === 'wallets') {
@@ -159,6 +160,42 @@ const LandingPage = () => {
     }
   };
 
+  
+
+const handleTransferFunds = async () => {
+  if (!selectedWallet) return;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.post('http://localhost:5073/api/account/transfer', {
+      senderAccountId: selectedWallet.id,
+      recipientAccountId: parseInt(recipientAccountId),
+      amount: parseFloat(amount)
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json-patch+json'
+      }
+    });
+    setMessage(response.data.message);
+    setMessageType('success');
+    setSelectedWallet(prev => ({
+      ...prev,
+      balance: prev.balance - parseFloat(amount)
+    }));
+    setAmount('');
+    setRecipientAccountId('');
+  } catch (error) {
+    if (error.response) {
+      setMessage(error.response.data.message);
+      setMessageType('error');
+    } else {
+      setMessage('An error occurred while transferring funds');
+      setMessageType('error');
+    }
+  }
+};
+
+
   return (
     <div className="landing-page">
       <div className="sidebar">
@@ -234,10 +271,43 @@ const LandingPage = () => {
           </div>
         )}
         {activeSection === 'transfer' && (
-          <div className="transfer-section">
-            {/* Transfer functionality will go here */}
-            <h3>Transfer Section</h3>
-          </div>
+        <div className="transfer-section">
+            <div className="wallet-buttons">
+            {wallets.map(wallet => (
+                <button
+                key={wallet.id}
+                className={`wallet-button ${selectedWallet?.id === wallet.id ? 'active' : ''}`}
+                onClick={() => handleWalletSelection(wallet)}
+                >
+                {wallet.accountName}
+                </button>
+            ))}
+            </div>
+            {selectedWallet && (
+            <div className="wallet-details">
+                <h3>{selectedWallet.accountName}</h3>
+                <p>Wallet ID: {selectedWallet.id}</p>
+                <p>Balance: {selectedWallet.balance}</p>
+                <p>Currency: {selectedWallet.currency === 0 ? 'TRY' : 'USD'}</p>
+                <div className="transaction-section">
+                <input
+                    type="number"
+                    value={recipientAccountId}
+                    onChange={(e) => setRecipientAccountId(e.target.value)}
+                    placeholder="Recipient Account ID"
+                />
+                <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Amount"
+                />
+                <button onClick={handleTransferFunds}>Transfer</button>
+                {message && <p className={`message ${messageType}`}>{message}</p>}
+                </div>
+            </div>
+            )}
+        </div>
         )}
       </div>
     </div>
