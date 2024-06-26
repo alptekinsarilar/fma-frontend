@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.landing-page {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+.sidebar {
+  background-color: #fff;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.sidebar-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+.sidebar-item.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.sidebar-username {
+  margin-top: auto;
+  padding: 10px;
+  text-align: center;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.wallets-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.wallet-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.wallet-button, .create-wallet-button {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.wallet-button.active, .wallet-button:hover {
+  border-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.create-wallet-button {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.create-wallet-button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.wallet-details {
+  margin-top: 20px;
+}
+
+.create-wallet-form {
+  margin-top: 20px;
+}
+
+.create-wallet-form .form-group {
+  margin-bottom: 15px;
+}
+
+.create-wallet-form .form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.create-wallet-form .form-group input, .create-wallet-form .form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
