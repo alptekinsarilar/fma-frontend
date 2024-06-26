@@ -11,6 +11,7 @@ const LandingPage = () => {
   const [activeSection, setActiveSection] = useState('wallets');
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // success or error
 
   useEffect(() => {
     if (activeSection === 'wallets') {
@@ -66,6 +67,7 @@ const LandingPage = () => {
         }
       });
       setMessage(response.data.message);
+      setMessageType('success');
       setSelectedWallet(prev => ({
         ...prev,
         balance: prev.balance + parseFloat(amount)
@@ -77,7 +79,13 @@ const LandingPage = () => {
         )
       );
     } catch (error) {
-      console.error('Error depositing money:', error);
+      if (error.response) {
+        setMessage(error.response.data.message);
+        setMessageType('error');
+      } else {
+        setMessage('An error occurred while depositing money');
+        setMessageType('error');
+      }
     }
   };
 
@@ -95,6 +103,7 @@ const LandingPage = () => {
         }
       });
       setMessage(response.data.message);
+      setMessageType('success');
       setSelectedWallet(prev => ({
         ...prev,
         balance: prev.balance - parseFloat(amount)
@@ -106,7 +115,13 @@ const LandingPage = () => {
         )
       );
     } catch (error) {
-      console.error('Error withdrawing money:', error);
+      if (error.response) {
+        setMessage(error.response.data.message);
+        setMessageType('error');
+      } else {
+        setMessage('An error occurred while withdrawing money');
+        setMessageType('error');
+      }
     }
   };
 
@@ -153,7 +168,7 @@ const LandingPage = () => {
                   />
                   <button onClick={handleDeposit}>Deposit</button>
                   <button onClick={handleWithdraw}>Withdraw</button>
-                  {message && <p className="message">{message}</p>}
+                  {message && <p className={`message ${messageType}`}>{message}</p>}
                 </div>
               </div>
             )}

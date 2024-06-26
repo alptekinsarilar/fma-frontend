@@ -139,5 +139,12 @@ body {
 
 .transaction-section .message {
   margin-top: 10px;
+}
+
+.transaction-section .message.success {
   color: #4CAF50;
+}
+
+.transaction-section .message.error {
+  color: red;
 }
