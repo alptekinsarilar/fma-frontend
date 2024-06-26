@@ -231,12 +231,16 @@ const handleTransferFunds = async () => {
                 <p>Balance: {selectedWallet.balance}</p>
                 <p>Currency: {selectedWallet.currency === 0 ? 'TRY' : 'USD'}</p>
                 <div className="transaction-section">
-                  <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Amount"
-                  />
+                  <div className="input-group">
+                    <label htmlFor="amount">Amount:</label>
+                    <input
+                      type="number"
+                      id="amount"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="Amount"
+                    />
+                  </div>
                   <button onClick={handleDeposit}>Deposit</button>
                   <button onClick={handleWithdraw}>Withdraw</button>
                   <button onClick={handleDeleteWallet} className="delete-button">Delete Wallet</button>
@@ -290,24 +294,32 @@ const handleTransferFunds = async () => {
                 <p>Balance: {selectedWallet.balance}</p>
                 <p>Currency: {selectedWallet.currency === 0 ? 'TRY' : 'USD'}</p>
                 <div className="transaction-section">
-                <input
-                    type="number"
-                    value={recipientAccountId}
-                    onChange={(e) => setRecipientAccountId(e.target.value)}
-                    placeholder="Recipient Account ID"
-                />
-                <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Amount"
-                />
-                <button onClick={handleTransferFunds}>Transfer</button>
-                {message && <p className={`message ${messageType}`}>{message}</p>}
+                  <div className="input-group">
+                    <label htmlFor="recipientAccountId">Recipient Account ID:</label>
+                    <input
+                      type="number"
+                      id="recipientAccountId"
+                      value={recipientAccountId}
+                      onChange={(e) => setRecipientAccountId(e.target.value)}
+                      placeholder="Recipient Account ID"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label htmlFor="amount">Amount:</label>
+                    <input
+                      type="number"
+                      id="amount"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="Amount"
+                    />
+                  </div>
+                  <button onClick={handleTransferFunds}>Transfer</button>
+                  {message && <p className={`message ${messageType}`}>{message}</p>}
                 </div>
-            </div>
+              </div>
             )}
-        </div>
+          </div>
         )}
       </div>
     </div>
