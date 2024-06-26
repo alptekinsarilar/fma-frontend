@@ -66,8 +66,16 @@ const LandingPage = () => {
         }
       });
       setMessage(response.data.message);
+      setSelectedWallet(prev => ({
+        ...prev,
+        balance: prev.balance + parseFloat(amount)
+      }));
       setAmount('');
-      fetchWallets(); // Refresh the wallets to update the balance
+      setWallets(prevWallets => 
+        prevWallets.map(wallet => 
+          wallet.id === selectedWallet.id ? { ...wallet, balance: wallet.balance + parseFloat(amount) } : wallet
+        )
+      );
     } catch (error) {
       console.error('Error depositing money:', error);
     }
@@ -87,8 +95,16 @@ const LandingPage = () => {
         }
       });
       setMessage(response.data.message);
+      setSelectedWallet(prev => ({
+        ...prev,
+        balance: prev.balance - parseFloat(amount)
+      }));
       setAmount('');
-      fetchWallets(); // Refresh the wallets to update the balance
+      setWallets(prevWallets => 
+        prevWallets.map(wallet => 
+          wallet.id === selectedWallet.id ? { ...wallet, balance: wallet.balance - parseFloat(amount) } : wallet
+        )
+      );
     } catch (error) {
       console.error('Error withdrawing money:', error);
     }
