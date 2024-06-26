@@ -125,6 +125,13 @@ const LandingPage = () => {
     }
   };
 
+  const handleWalletSelection = (wallet) => {
+    setSelectedWallet(wallet);
+    setAmount('');
+    setMessage('');
+    setMessageType('');
+  };
+
   return (
     <div className="landing-page">
       <div className="sidebar">
@@ -144,7 +151,7 @@ const LandingPage = () => {
                 <button
                   key={wallet.id}
                   className={`wallet-button ${selectedWallet?.id === wallet.id ? 'active' : ''}`}
-                  onClick={() => setSelectedWallet(wallet)}
+                  onClick={() => handleWalletSelection(wallet)}
                 >
                   {wallet.accountName}
                 </button>
