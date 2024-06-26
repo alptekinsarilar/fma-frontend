@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './LandingPage.css'; // Create this CSS file for styling
+import './LandingPage.css';
 
 const LandingPage = () => {
   const [wallets, setWallets] = useState([]);
@@ -9,6 +9,8 @@ const LandingPage = () => {
   const [accountName, setAccountName] = useState('');
   const [currency, setCurrency] = useState(0);
   const [activeSection, setActiveSection] = useState('wallets');
+  const [amount, setAmount] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (activeSection === 'wallets') {
@@ -50,6 +52,48 @@ const LandingPage = () => {
     }
   };
 
+  const handleDeposit = async () => {
+    if (!selectedWallet) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:5073/api/account/fund', {
+        accountId: selectedWallet.id,
+        amount: parseFloat(amount)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json-patch+json'
+        }
+      });
+      setMessage(response.data.message);
+      setAmount('');
+      fetchWallets(); // Refresh the wallets to update the balance
+    } catch (error) {
+      console.error('Error depositing money:', error);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (!selectedWallet) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:5073/api/account/withdraw', {
+        accountId: selectedWallet.id,
+        amount: parseFloat(amount)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json-patch+json'
+        }
+      });
+      setMessage(response.data.message);
+      setAmount('');
+      fetchWallets(); // Refresh the wallets to update the balance
+    } catch (error) {
+      console.error('Error withdrawing money:', error);
+    }
+  };
+
   return (
     <div className="landing-page">
       <div className="sidebar">
@@ -84,6 +128,17 @@ const LandingPage = () => {
                 <p>Wallet ID: {selectedWallet.id}</p>
                 <p>Balance: {selectedWallet.balance}</p>
                 <p>Currency: {selectedWallet.currency === 0 ? 'TRY' : 'USD'}</p>
+                <div className="transaction-section">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Amount"
+                  />
+                  <button onClick={handleDeposit}>Deposit</button>
+                  <button onClick={handleWithdraw}>Withdraw</button>
+                  {message && <p className="message">{message}</p>}
+                </div>
               </div>
             )}
             {showCreateWalletForm && (
