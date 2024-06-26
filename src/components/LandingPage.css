@@ -166,3 +166,32 @@ body {
     color: red;
   }
   
+  .transaction-list {
+    margin-top: 20px;
+  }
+  
+  .transaction-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .transaction-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .transaction-item p {
+    margin: 0;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .transaction-item .description {
+    flex: 2;
+  }
+  

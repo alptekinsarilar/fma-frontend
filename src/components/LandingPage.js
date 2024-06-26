@@ -21,6 +21,9 @@ const [exchangeMessage, setExchangeMessage] = useState('');
 const [exchangeMessageType, setExchangeMessageType] = useState(''); // success or error
 const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('');
 
+const [transactions, setTransactions] = useState([]);
+const [loadingTransactions, setLoadingTransactions] = useState(false);
+const [transactionError, setTransactionError] = useState('');
 
   useEffect(() => {
     if (activeSection === 'wallets') {
@@ -248,6 +251,27 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
     }
   };
   
+  const fetchTransactions = async (accountId) => {
+    setLoadingTransactions(true);
+    setTransactionError('');
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:5073/api/account/transactions/${accountId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setTransactions(response.data);
+    } catch (error) {
+      if (error.response) {
+        setTransactionError(error.response.data.message);
+      } else {
+        setTransactionError('An error occurred while fetching transactions');
+      }
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
   
   
 
@@ -263,6 +287,10 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
         <div className={`sidebar-item ${activeSection === 'exchange' ? 'active' : ''}`} onClick={() => setActiveSection('exchange')}>
             Exchange Currency
         </div>
+        <div className={`sidebar-item ${activeSection === 'transactions' ? 'active' : ''}`} onClick={() => setActiveSection('transactions')}>
+        Past Transactions
+        </div>
+
         <div className="sidebar-username">{getUsernameFromToken()}</div>
       </div>
       <div className="content">
@@ -426,7 +454,47 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
             )}
         </div>
         )}
-
+        {activeSection === 'transactions' && (
+        <div className="transactions-section">
+            <div className="wallet-buttons">
+            {wallets.map(wallet => (
+                <button
+                key={wallet.id}
+                className={`wallet-button ${selectedWallet?.id === wallet.id ? 'active' : ''}`}
+                onClick={() => {
+                    handleWalletSelection(wallet);
+                    fetchTransactions(wallet.id);
+                }}
+                >
+                {wallet.accountName}
+                </button>
+            ))}
+            </div>
+            {selectedWallet && (
+            <div className="transaction-list">
+                <h3>Past Transactions for {selectedWallet.accountName}</h3>
+                {loadingTransactions ? (
+                <p>Loading transactions...</p>
+                ) : transactionError ? (
+                <p className="error">{transactionError}</p>
+                ) : transactions.length === 0 ? (
+                <p>No transactions found.</p>
+                ) : (
+                <div className="transaction-items">
+                    {transactions.map(transaction => (
+                    <div key={transaction.id} className="transaction-item">
+                        <p>{transaction.description}</p>
+                        <p>{transaction.amount}</p>
+                        <p>{transaction.category}</p>
+                        <p>{new Date(transaction.transactionDate).toLocaleString()}</p>
+                    </div>
+                    ))}
+                </div>
+                )}
+            </div>
+            )}
+        </div>
+        )}
       </div>
     </div>
   );
