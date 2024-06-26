@@ -131,6 +131,10 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
     setAmount('');
     setMessage('');
     setMessageType('');
+    setExchangeAmount(''); // Add this line
+  setExchangeRecipientAccountId(''); // Add this line
+  setExchangeMessage(''); // Add this line
+  setExchangeMessageType(''); // Add this line
   };
 
   const handleDeleteWallet = async () => {
@@ -219,6 +223,10 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
       });
       setExchangeMessage('Exchange successful');
       setExchangeMessageType('success');
+      setSelectedWallet(prev => ({
+        ...prev,
+        balance: prev.balance - parseFloat(exchangeAmount) // Update balance
+      }));
       setExchangeAmount('');
       setExchangeRecipientAccountId('');
       fetchWallets();
@@ -232,6 +240,7 @@ const [exchangeRecipientAccountId, setExchangeRecipientAccountId] = useState('')
       }
     }
   };
+  
   
   
 
