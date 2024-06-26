@@ -38,7 +38,7 @@ const LandingPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5073/api/account', {
+      await axios.post('http://localhost:5073/api/account', {
         accountName,
         currency
       }, {
@@ -47,7 +47,7 @@ const LandingPage = () => {
           'Content-Type': 'application/json-patch+json'
         }
       });
-      setWallets([...wallets, response.data]);
+      fetchWallets();
       setShowCreateWalletForm(false);
     } catch (error) {
       console.error('Error creating wallet:', error);
@@ -58,7 +58,7 @@ const LandingPage = () => {
     if (!selectedWallet) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5073/api/account/fund', {
+      await axios.post('http://localhost:5073/api/account/fund', {
         accountId: selectedWallet.id,
         amount: parseFloat(amount)
       }, {
@@ -67,18 +67,14 @@ const LandingPage = () => {
           'Content-Type': 'application/json-patch+json'
         }
       });
-      setMessage(response.data.message);
+      setMessage('Deposit successful');
       setMessageType('success');
       setSelectedWallet(prev => ({
         ...prev,
         balance: prev.balance + parseFloat(amount)
       }));
       setAmount('');
-      setWallets(prevWallets => 
-        prevWallets.map(wallet => 
-          wallet.id === selectedWallet.id ? { ...wallet, balance: wallet.balance + parseFloat(amount) } : wallet
-        )
-      );
+      fetchWallets();
     } catch (error) {
       if (error.response) {
         setMessage(error.response.data.message);
@@ -94,7 +90,7 @@ const LandingPage = () => {
     if (!selectedWallet) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5073/api/account/withdraw', {
+      await axios.post('http://localhost:5073/api/account/withdraw', {
         accountId: selectedWallet.id,
         amount: parseFloat(amount)
       }, {
@@ -103,18 +99,14 @@ const LandingPage = () => {
           'Content-Type': 'application/json-patch+json'
         }
       });
-      setMessage(response.data.message);
+      setMessage('Withdraw successful');
       setMessageType('success');
       setSelectedWallet(prev => ({
         ...prev,
         balance: prev.balance - parseFloat(amount)
       }));
       setAmount('');
-      setWallets(prevWallets => 
-        prevWallets.map(wallet => 
-          wallet.id === selectedWallet.id ? { ...wallet, balance: wallet.balance - parseFloat(amount) } : wallet
-        )
-      );
+      fetchWallets();
     } catch (error) {
       if (error.response) {
         setMessage(error.response.data.message);
@@ -147,7 +139,7 @@ const LandingPage = () => {
         setMessage('Wallet deleted successfully');
         setMessageType('success');
         setSelectedWallet(null);
-        setWallets(wallets.filter(wallet => wallet.id !== selectedWallet.id));
+        fetchWallets();
       } catch (error) {
         if (error.response) {
           setMessage(error.response.data.message);
@@ -160,41 +152,39 @@ const LandingPage = () => {
     }
   };
 
-  
-
-const handleTransferFunds = async () => {
-  if (!selectedWallet) return;
-  try {
-    const token = localStorage.getItem('token');
-    const response = await axios.post('http://localhost:5073/api/account/transfer', {
-      senderAccountId: selectedWallet.id,
-      recipientAccountId: parseInt(recipientAccountId),
-      amount: parseFloat(amount)
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json-patch+json'
+  const handleTransferFunds = async () => {
+    if (!selectedWallet) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5073/api/account/transfer', {
+        senderAccountId: selectedWallet.id,
+        recipientAccountId: parseInt(recipientAccountId),
+        amount: parseFloat(amount)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json-patch+json'
+        }
+      });
+      setMessage('Transfer successful');
+      setMessageType('success');
+      setSelectedWallet(prev => ({
+        ...prev,
+        balance: prev.balance - parseFloat(amount)
+      }));
+      setAmount('');
+      setRecipientAccountId('');
+      fetchWallets();
+    } catch (error) {
+      if (error.response) {
+        setMessage(error.response.data.message);
+        setMessageType('error');
+      } else {
+        setMessage('An error occurred while transferring funds');
+        setMessageType('error');
       }
-    });
-    setMessage(response.data.message);
-    setMessageType('success');
-    setSelectedWallet(prev => ({
-      ...prev,
-      balance: prev.balance - parseFloat(amount)
-    }));
-    setAmount('');
-    setRecipientAccountId('');
-  } catch (error) {
-    if (error.response) {
-      setMessage(error.response.data.message);
-      setMessageType('error');
-    } else {
-      setMessage('An error occurred while transferring funds');
-      setMessageType('error');
     }
-  }
-};
-
+  };
 
   return (
     <div className="landing-page">
@@ -275,20 +265,20 @@ const handleTransferFunds = async () => {
           </div>
         )}
         {activeSection === 'transfer' && (
-        <div className="transfer-section">
+          <div className="transfer-section">
             <div className="wallet-buttons">
-            {wallets.map(wallet => (
+              {wallets.map(wallet => (
                 <button
-                key={wallet.id}
-                className={`wallet-button ${selectedWallet?.id === wallet.id ? 'active' : ''}`}
-                onClick={() => handleWalletSelection(wallet)}
+                  key={wallet.id}
+                  className={`wallet-button ${selectedWallet?.id === wallet.id ? 'active' : ''}`}
+                  onClick={() => handleWalletSelection(wallet)}
                 >
-                {wallet.accountName}
+                  {wallet.accountName}
                 </button>
-            ))}
+              ))}
             </div>
             {selectedWallet && (
-            <div className="wallet-details">
+              <div className="wallet-details">
                 <h3>{selectedWallet.accountName}</h3>
                 <p>Wallet ID: {selectedWallet.id}</p>
                 <p>Balance: {selectedWallet.balance}</p>
